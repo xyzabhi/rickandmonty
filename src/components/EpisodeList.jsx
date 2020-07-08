@@ -6,17 +6,27 @@ import Pagination from "./Pagination";
 import SearchBar from "./SearchBar";
 function EpisodeList() {
   const [episodes, setEpisodes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [currSearch, setSearch] = useState("");
   const [currLink, setLink] = useState("page=1");
+  const [currError, setError] = useState("");
 
   useEffect(() => {
     axios
       .get(`https://rickandmortyapi.com/api/episode/?${currLink}`)
       .then((res) => {
+        setLoading(false);
         setEpisodes(res.data.results);
+        console.log(currLink);
+        setError("");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+        setEpisodes([]);
+        setError("No match found");
+      });
   }, [page, currSearch, currLink]);
 
   return (
@@ -33,7 +43,7 @@ function EpisodeList() {
         ))}
       </div>
       <Pagination info={page} func={setPage} funcLink={setLink} />
-      <h1>{currSearch}</h1>
+      <p>{currError}</p>
     </div>
   );
 }
